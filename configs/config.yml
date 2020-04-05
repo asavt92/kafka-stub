@@ -1,0 +1,14 @@
+kafka:
+  in.topic: icc-detail-in-topic
+  out.topic: icc-detail-out-topic
+  group: iacc-assist-serv
+  bootstrap.servers: localhost:9092
+
+#путь до json схемы для валидации входях сообщений
+in.json.schema.path: data/eksCommissionRequest_schema.json
+
+#путь до директории с примерами исходящих сообщений json
+out.json.examples.dir.path: data/out/
+
+# настройка используется для того, чтобы у входящего запроса скопировать поля в исходящий ответ.
+id.field.mapping: {"rquid":"rquid"}
