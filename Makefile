@@ -1,5 +1,8 @@
 PROJECTNAME := $(shell basename "$(PWD)")
-
+# Go related variables.
+GOBASE := $(shell pwd)
+GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOBIN := $(GOBASE)
 
 .PHONY: build
 build:
@@ -9,8 +12,9 @@ build:
 docker: build
 	docker build -t $(PROJECTNAME) .
 
-#.PHONY: test
-#test:
-#	go test -v -race -timeout 30s ./...
+.PHONY: go-get
+go-get:
+	@echo "  >  Checking if there is any missing dependencies..."
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
 
 .DEFAULT_GOAL := build

@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/asavt92/kafka-stub/internal/configs"
 	log "github.com/sirupsen/logrus"
@@ -66,10 +65,10 @@ func (c *Producer) Start() {
 			select {
 			case producer.Input() <- &msg:
 				enqueued++
-				fmt.Println("Produce message")
+				log.Info("Produce message: ", msg.Key, msg.Value)
 			case err := <-producer.Errors():
 				errors++
-				fmt.Println("Failed to produce message:", err)
+				log.Errorf("Failed to produce message: %v", err)
 			case <-signals:
 				doneCh <- struct{}{}
 			}

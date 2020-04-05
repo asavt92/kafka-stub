@@ -4,6 +4,7 @@ import (
 	"flag"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -45,7 +46,8 @@ func InitConfig() {
 		viper.SetConfigType("yaml")
 		err := viper.ReadInConfig()
 		if err != nil {
-			log.Panicf("Unable to read config file: %s", err)
+			log.Fatalf("Unable to read config file: %s", err)
+			os.Exit(1)
 		}
 	} else {
 		log.Infof("Config file is not specified.")
