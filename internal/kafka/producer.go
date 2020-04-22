@@ -25,7 +25,6 @@ func NewProducer(config *configs.KafkaConfig, inChannel chan sarama.ProducerMess
 	}
 }
 
-
 func (c *Producer) Start() {
 	// Setup configuration
 	config := sarama.NewConfig()
@@ -36,7 +35,7 @@ func (c *Producer) Start() {
 	config.Producer.Retry.Max = 5
 	// The level of acknowledgement reliability needed from the broker.
 	config.Producer.RequiredAcks = sarama.WaitForLocal
-	config.Producer.Flush.Frequency= time.Millisecond*400
+	config.Producer.Flush.Frequency = time.Millisecond * 400
 	config.Version = sarama.V2_1_0_0
 
 	producer, err := sarama.NewAsyncProducer(c.KafkaBrokers, config)
@@ -59,13 +58,13 @@ func (c *Producer) Start() {
 	doneCh := make(chan struct{})
 	go func() {
 		for {
-			msg := <- c.InChannel
-			msg.Topic=c.KafkaTopics[0]
+			msg := <-c.InChannel
+			msg.Topic = c.KafkaTopics[0]
 
 			select {
 			case producer.Input() <- &msg:
 				enqueued++
-				log.Info("Produce message: ", msg.Key, msg.Value)
+				log.Info("Produce message: ", msg.Value)
 			case err := <-producer.Errors():
 				errors++
 				log.Errorf("Failed to produce message: %v", err)
@@ -77,6 +76,5 @@ func (c *Producer) Start() {
 
 	<-doneCh
 	log.Printf("Enqueued: %d; errors: %d\n", enqueued, errors)
-
 
 }

@@ -11,4 +11,4 @@ in.json.schema.path: data/eksCommissionRequest_schema.json
 out.json.examples.dir.path: data/out/
 
 #используется для того, чтобы у входящего запроса скопировать поля в исходящий ответ. Ключ - имя поля входящего запроса, значение - имя поля исходящего сообщения.
-id.field.mapping: {"rquid":"rquid"}
+id.field.mapping: {"from":"payerAccount", "to":"rquid"}

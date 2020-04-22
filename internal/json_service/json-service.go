@@ -1,6 +1,8 @@
-package json
+package json_service
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/asavt92/kafka-stub/internal/configs"
 	log "github.com/sirupsen/logrus"
 	"github.com/xeipuuv/gojsonschema"
@@ -16,7 +18,7 @@ const (
 type JsonService struct {
 	JsonConfig       configs.JsonConfig
 	ValidationSchema gojsonschema.JSONLoader
-	ResponseExamples []string
+	ResponseExamples []map[string]interface{}
 }
 
 func NewJsonService(c *configs.JsonConfig) *JsonService {
@@ -47,13 +49,12 @@ func readJsonFile(file string) (string, error) {
 	return string(j), err
 }
 
-func loadJsonFiles(pattern string) []string {
+func loadJsonFiles(pattern string) []map[string]interface{} {
 	files, err := filepath.Glob(pattern)
 	if err != nil {
 		log.Fatal(err)
 	}
-	var list []string
-
+	var list []map[string]interface{}
 
 	if len(files) == 0 {
 		log.Fatal("No one json files match pattern: ", pattern)
@@ -65,10 +66,16 @@ func loadJsonFiles(pattern string) []string {
 			log.Warnf("error while loading file %s", file)
 			continue
 		}
-		list = append(list, j)
-		log.Infof("loaded json file: %s", file)
-	}
 
+		var raw map[string]interface{}
+		if err := json.Unmarshal([]byte(j), &raw); err != nil {
+			panic(err)
+		}
+
+		list = append(list, raw)
+		log.Infof("loaded json file: %s", file)
+		log.Debug(raw)
+	}
 
 	return list
 }
@@ -89,11 +96,18 @@ func (service *JsonService) IsJsonStringValid(jsonString string) bool {
 	}
 }
 
-func (service *JsonService) GetRandomJsonResponseString() string {
+func (service *JsonService) GetRandomJsonResponseString() map[string]interface{} {
 	return service.ResponseExamples[rand.Intn(len(service.ResponseExamples))]
 }
 
-//todo добавить копирование полей из маппинга
-func CopyFieldValueByMapping(fromObject *map[string]interface{}, toObject *map[string]interface{}) map[string]interface{} {
-	return *toObject
+func (service *JsonService) GetJsonResponseStringByConfiguredFieldMapping(value string) (map[string]interface{}, error) {
+	//keys := reflect.ValueOf(service.JsonConfig.IdFieldMapping).MapKeys()
+	//key := service.JsonConfig.IdFieldMapping[keys[0].String()]
+	key := service.JsonConfig.IdFieldMapping["to"]
+	for _, res := range service.ResponseExamples {
+		if res[key] == value {
+			return res, nil
+		}
+	}
+	return nil, errors.New("There is no one response example with this mapping " + key + " = " + value)
 }

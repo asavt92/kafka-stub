@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/Shopify/sarama"
 	"github.com/asavt92/kafka-stub/internal/configs"
-	"github.com/asavt92/kafka-stub/internal/json"
+	"github.com/asavt92/kafka-stub/internal/json_service"
 	"github.com/asavt92/kafka-stub/internal/kafka"
 	"github.com/asavt92/kafka-stub/internal/processors"
 )
@@ -11,7 +11,7 @@ import (
 var (
 	kafkaConfig         *configs.KafkaConfig
 	jsonConfig          *configs.JsonConfig
-	jsonService         *json.JsonService
+	jsonService         *json_service.JsonService
 	consumer            kafka.Consumer
 	producer            kafka.Producer
 	fromConsumerChannel = make(chan sarama.ConsumerMessage, 100)
@@ -24,7 +24,7 @@ func initApp() {
 	configs.InitConfig()
 	kafkaConfig = configs.InitKafkaConfig()
 	jsonConfig = configs.InitJsonConfig()
-	jsonService = json.NewJsonService(jsonConfig)
+	jsonService = json_service.NewJsonService(jsonConfig)
 
 	mainProcService = processors.NewMainService(jsonService, fromConsumerChannel, toProducerChannel)
 
