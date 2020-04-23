@@ -1,4 +1,9 @@
+FROM  golang:1.13.10 AS build-env
+ADD . /src
+RUN cd /src && make build
+
+
 FROM scratch
-ADD main /
-ADD configs/config.yml /configs/config.yml
+COPY --from=build-env /src/main /
+COPY --from=build-env /src/configs/config.yml /configs/config.yml
 CMD ["/main"]
