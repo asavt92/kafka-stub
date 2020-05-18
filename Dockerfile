@@ -1,4 +1,5 @@
-FROM  golang:1.13.10 AS build-env
+ARG VERSION=1.13.10
+FROM  golang:${VERSION} AS build-env
 ADD . /src
 RUN cd /src && make build
 

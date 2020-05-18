@@ -47,6 +47,14 @@ func (m *MainService) Start() {
 				res, _ := m.JsonService.GetJsonResponseStringByConfiguredFieldMapping(fmt.Sprintf("%v", value))
 
 				if res == nil {
+					log.Infof("Not found examples by field mapping %v", m.JsonService.JsonConfig.IdFieldMapping)
+					res = m.JsonService.GetRandomJsonResponseString()
+				} else {
+					log.Infof("Found example by field mapping %v", m.JsonService.JsonConfig.IdFieldMapping)
+				}
+
+				if res == nil {
+					log.Info("Not found response examples, produce empty msg")
 					res = make(map[string]interface{})
 				}
 
